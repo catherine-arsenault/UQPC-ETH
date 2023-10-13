@@ -78,7 +78,7 @@ keep region facility_name org* period Post_Contra Faci_delivery ANC_first_16 ANC
 save  "$project/Data/Data for analysis/Health posts 2014.dta", replace	
 
 *------------------------------------------------------------------------------*/
-**completness table: Using the number of facilites that reproted at least onetime as denominator 
+* Completness table: Using the number of facilites that reproted at least onetime during the year as denominator 
 
 local varlist Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first malnutrition_exit malnutrition_cured  Essential_drug_avail FP_total OPD_total			
 			
