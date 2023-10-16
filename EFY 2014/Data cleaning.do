@@ -65,7 +65,7 @@ save "$project/Data/Data for analysis/UQPC 2014.dta", replace
 *------------------------------------------------------------------------------*
 * FACILITY-LEVEL DATA CLEANING: MONTLY DATA
 
-* Outlier value9
+* Outlier value
 replace ART_total=. if organisationunitid=="CANLdN1PnUh" & period==9 // outlier value over 2 billion
 
 * Replace missing indicators to 0 when related indicator is not missing
