@@ -121,10 +121,4 @@ preserve
 	collapse (sum) Post_Contra-OPD_total  , by(region facility_type)
 	export excel using "$project/EFY 2014 results.xlsx", sheet("Sums") firstrow(variable) sheetreplace
 restore
-	* Replacing the counts to 0 to identify how many facilities report the service at least once in EFY 2014
-	foreach x of local varlist {
-		replace `x'=. if `x'==0
-	}
-	collapse (count) Post_Contra-OPD_total  , by(region facility_type)
-	export excel using "$project/EFY 2014 results.xlsx", sheet("Counts") firstrow(variable) sheetreplace
 
