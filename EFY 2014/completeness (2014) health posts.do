@@ -71,17 +71,18 @@ rename essentialdrugsavailability Essential_drug_avail // this data element is n
 
 rename (totalnewandrepeatacceptorsdisagg numberofoutpatientvisits) (FP_total OPD_total)
 
-			
-*------------------------------------------------------------------------------*/
+		
 keep region facility_name org* period Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first malnutrition_exit malnutrition_cured  Essential_drug_avail FP_total OPD_total
-
+*------------------------------------------------------------------------------*/
+* Removing Zeros (only 5 indicators have values of 0: PNC two days, ART total, Essential drug availability and FP_total)
+local varlist Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first malnutrition_exit malnutrition_cured  Essential_drug_avail FP_total OPD_total
+foreach x of local varlist {
+	replace `x'=. if `x'==0
+}	
 save  "$project/Data/Data for analysis/Health posts 2014.dta", replace	
 
 *------------------------------------------------------------------------------*/
-* Completness table: Using the number of facilites that reproted at least onetime during the year as denominator 
-
-local varlist Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first malnutrition_exit malnutrition_cured  Essential_drug_avail FP_total OPD_total			
-			
+* Completness table: Using the number of facilites that reproted at least onetime during the year as denominator 			
 foreach x of local varlist  {
 	egen count`x'=count(`x'), by(organisationunitid)
 	replace count`x'=. if count`x'==0

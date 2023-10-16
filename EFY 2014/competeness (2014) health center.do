@@ -87,17 +87,19 @@ rename totalnumberofclientswhoreceivedp Drug_presc_received // denominator
 * RENAMING 2014 VARIABLES: OPD and FP volumes
 
 rename (totalnewandrepeatacceptorsdisagg numberofoutpatientvisits) (FP_total OPD_total)
-			
-
 *------------------------------------------------------------------------------*/
 keep region facility_name org* period Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits syphilis_tested_preg Hepat_BC_tested_preg HIV_tested_preg IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first malnutrition_exit malnutrition_cured ART_still ART_original viral_load_undetect viral_load_tested TB_ART_screened ART_total Hyper_raised_BP Diabet_raised_BS Hyper_enrol_care Diabet_enrol_care Diabet6_controlled Diabet6_enrol_care Hyper6_controlled Hyper6_enrol_care Drug_presc_100 Drug_presc_received Essential_drug_avail FP_total OPD_total			
-			
-save  "$project/Data/Data for analysis/Health centers 2014.dta", replace
-	
 *------------------------------------------------------------------------------*/
-* Completness table: Using the number of facilites that reproted at least onetime as denominator 
-local varlist Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits syphilis_tested_preg Hepat_BC_tested_preg HIV_tested_preg IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first malnutrition_exit malnutrition_cured ART_still ART_original viral_load_undetect viral_load_tested TB_ART_screened ART_total Hyper_raised_BP Diabet_raised_BS Hyper_enrol_care Diabet_enrol_care Diabet6_controlled Diabet6_enrol_care Hyper6_controlled Hyper6_enrol_care Drug_presc_100 Drug_presc_received Essential_drug_avail 	FP_total OPD_total		
-			
+* Removing Zeros (only 5 indicators have values of 0: PNC two days, ART total, Essential drug availability and FP_total)			
+local varlist Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits syphilis_tested_preg Hepat_BC_tested_preg HIV_tested_preg IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first malnutrition_exit malnutrition_cured ART_still ART_original viral_load_undetect viral_load_tested TB_ART_screened ART_total Hyper_raised_BP Diabet_raised_BS Hyper_enrol_care Diabet_enrol_care Diabet6_controlled Diabet6_enrol_care Hyper6_controlled Hyper6_enrol_care Drug_presc_100 Drug_presc_received Essential_drug_avail 	FP_total OPD_total	
+
+foreach x of local varlist {
+	replace `x'=. if `x'==0
+}
+
+save  "$project/Data/Data for analysis/Health centers 2014.dta", replace
+*------------------------------------------------------------------------------*/
+* Completness table: Using the number of facilites that reproted at least onetime as denominator 			
 foreach x of local varlist  {
 	egen count`x'=count(`x'), by(organisationunitid)
 	replace count`x'=. if count`x'==0
