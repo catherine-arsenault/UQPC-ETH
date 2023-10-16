@@ -48,12 +48,13 @@ lab val facility_type facility_type
 encode orgunitlevel2, gen(region)
 drop orgunitlevel1
 
-
-* Drops duplicates (for now)
-drop if organisationunitid =="NWbRyTbZ6Tl" | organisationunitid =="rKk9wG6waw3" ///
-| organisationunitid =="MEJYJtqSqlT" | organisationunitid =="eVTPDz6hLUx" ///
-| organisationunitid =="JSpq4Ygdf99" | organisationunitid =="AfLp2iNnWDH"
-
+* Removing 6 facilities that were duplicated in two facility type datasets
+drop if organisationunitid =="NWbRyTbZ6Tl" & facility_type==3 // Asella Rehoboth Hospital is a private hospital
+drop if organisationunitid =="rKk9wG6waw3"  & facility_type==3 // Chilaloo Shede Hospital is a private hospital
+drop if organisationunitid =="MEJYJtqSqlT" & facility_type==5 // Modjo Primary Hospital is a public hospital
+drop if organisationunitid =="eVTPDz6hLUx" & facility_type==3 // Negelle Arsi General Hospital and Medical College is a Private Hospital
+drop if organisationunitid =="JSpq4Ygdf99" & facility_type==3 // Rifty Valley Hospital is a Private Hospital
+drop if organisationunitid =="AfLp2iNnWDH" & facility_type==1 // Sadi Mikael Health Center is a health center
 
 * Unique facility ids
 encode organisationunitid, gen(facid)
