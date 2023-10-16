@@ -43,7 +43,6 @@ save "$project/Data/Data for analysis/UQPC 2014.dta", replace
 order facility_type, after(orgunitlevel2)
 lab def facility_type 1"Health posts" 2"Health centers" 3"Private clinics" 4"Public hospitals" 5"Private hospitals"
 lab val facility_type facility_type
-
 *------------------------------------------------------------------------------*
 encode orgunitlevel2, gen(region)
 drop orgunitlevel1
@@ -89,6 +88,7 @@ replace Hyper6_enrol_care = Hyper6_controlled if Hyper6_enrol_care==. & Hyper6_c
 
 replace Drug_presc_received = Drug_presc_100 if Drug_presc_received==. & Drug_presc_100!=.
 
+save "$project/Data/Data for analysis/UQPC 2014.dta", replace
 *------------------------------------------------------------------------------*
 * CHECK COMPLETENESS AFTER IMPUTING ZEROS
 preserve 
@@ -116,13 +116,15 @@ replace ART_original = ART_still if ART_original==0 & ART_still!=0
 replace ART_total= TB_ART_screened if ART_total==0 & TB_ART_screened!=0 
 replace viral_load_test= viral_load_undetect if viral_load_test==0 & viral_load_undetect!=0
 
-
 * Collapse by region and facility type
 preserve 
 	collapse (sum) Post_Contra-OPD_total  , by(region facility_type)
 	export excel using "$project/EFY 2014 results.xlsx", sheet("Sums") firstrow(variable) sheetreplace
 restore
-
+	* Replacing the counts to 0 to identify how many facilities report the service at least once in EFY 2014
+	foreach x of local varlist {
+		replace `x'=. if `x'==0
+	}
 	collapse (count) Post_Contra-OPD_total  , by(region facility_type)
 	export excel using "$project/EFY 2014 results.xlsx", sheet("Counts") firstrow(variable) sheetreplace
 
