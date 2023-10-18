@@ -99,7 +99,7 @@ foreach x of local varlist {
 
 save  "$project/Data/Data for analysis/Health centers 2014.dta", replace
 *------------------------------------------------------------------------------*/
-* Completness table: Using the number of facilites that reproted at least onetime as denominator 			
+* Completness table: Using the number of facilites that reported at least onetime during the year as denominator 			
 foreach x of local varlist  {
 	egen count`x'=count(`x'), by(organisationunitid)
 	replace count`x'=. if count`x'==0
@@ -110,6 +110,7 @@ collapse (count) Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four
 			
 foreach x of local varlist  {
 cap gen complete`x'=(`x'/count`x')*100
+egen avg_compl_`x' = mean(complete`x'), by(region)
 }
 			
 export excel using "$project/completeness_health centers 2014.xlsx", sheet(Option_two) firstrow(variable) sheetreplace			

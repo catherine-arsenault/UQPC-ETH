@@ -92,7 +92,8 @@ collapse (count) Post_Contra Faci_delivery ANC_first_16 ANC_first_total ANC_four
 			
 			
 foreach x of local varlist  {
-cap gen complete`x'=(`x'/count`x')*100
+	cap gen complete`x'=(`x'/count`x')*100
+	egen avg_compl_`x' = mean(complete`x'), by(region)
 }
 
 export excel using "$project/completeness_health post 2014.xlsx", sheet(Option_two) firstrow(variable) sheetreplace

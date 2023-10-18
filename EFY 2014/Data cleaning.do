@@ -4,7 +4,6 @@
 * EFY 2014
 *------------------------------------------------------------------------------*
 global project "/Users/catherine.arsenault/Dropbox/9 PAPERS & PROJECTS/UQPC/DHIS2/"
-
 * Appending facility types 
 *HP
 use "$project/Data/Data for analysis/Health posts 2014.dta", clear
@@ -47,7 +46,7 @@ lab val facility_type facility_type
 encode orgunitlevel2, gen(region)
 drop orgunitlevel1
 
-* Removing 6 facilities that were duplicated in two facility type datasets
+* Removing 6 facilities that were duplicated as two different facility types
 drop if organisationunitid =="NWbRyTbZ6Tl" & facility_type==3 // Asella Rehoboth Hospital is a private hospital
 drop if organisationunitid =="rKk9wG6waw3"  & facility_type==3 // Chilaloo Shede Hospital is a private hospital
 drop if organisationunitid =="MEJYJtqSqlT" & facility_type==5 // Modjo Primary Hospital is a public hospital
@@ -62,7 +61,7 @@ order region period facility_type facid org*
 sort region facility_type facid period 
 save "$project/Data/Data for analysis/UQPC 2014.dta", replace
 *------------------------------------------------------------------------------*
-* FACILITY-LEVEL DATA CLEANING: MONTLY DATA
+* FACILITY-LEVEL DATA CLEANING: MONTHLY DATA
 
 * Outlier value
 replace ART_total=. if organisationunitid=="CANLdN1PnUh" & period==9 // outlier value over 2 billion
@@ -100,10 +99,12 @@ preserve
 		}	
 		
 	collapse (count) Post_Contra-countOPD_total, by(region period facility_type)
-			
+	sort region facility_type period
 	foreach x of local varlist  {
-	cap gen complete`x'=(`x'/count`x')*100
+		gen complete`x'=(`x'/count`x')*100
+		egen avg_compl_`x' = mean(complete`x'), by(region facility_type) 
 	}
+	order avg_*, after(completeOPD_total)
 	export excel using "$project/completeness_2014_after_cleaning.xlsx", firstrow(variable) sheetreplace
 restore 		
 *------------------------------------------------------------------------------*
@@ -116,7 +117,7 @@ replace ART_original = ART_still if ART_original==0 & ART_still!=0
 replace ART_total= TB_ART_screened if ART_total==0 & TB_ART_screened!=0 
 replace viral_load_test= viral_load_undetect if viral_load_test==0 & viral_load_undetect!=0
 
-* Collapse by region and facility type
+* SUM OF SERVICES BY REGION AND FACILITY TYPE
 preserve 
 	collapse (sum) Post_Contra-OPD_total  , by(region facility_type)
 	export excel using "$project/EFY 2014 results.xlsx", sheet("Sums") firstrow(variable) sheetreplace
