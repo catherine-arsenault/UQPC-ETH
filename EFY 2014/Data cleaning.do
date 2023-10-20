@@ -68,6 +68,7 @@ replace ART_total=. if organisationunitid=="CANLdN1PnUh" & period==9 // outlier 
 
 * Replace missing indicators to 0 when related indicator is not missing
 replace Post_Contra = 0 if Faci_delivery!=. & Faci_delivery!=0 & Post_Contra==.
+
 replace ANC_first_16 = 0 if ANC_first_total!=. & ANC_first_total!=0 & ANC_first_16 ==.
 
 replace syphilis_tested_preg= 0 if ANC_first_total!=. & ANC_first_total!=0 & syphilis_tested_preg==. & facility_type!=1
@@ -113,7 +114,7 @@ restore
 * Collapse at the annual level for each facility 
 collapse (sum) Post_Contra-OPD_total, by(region facility_type facid org*)
 
-replace ART_original = ART_still if ART_original==0 & ART_still!=0
+replace ART_original = ART_still if ART_original==0 & ART_still!=0 // what about the transfers ?
 replace ART_total= TB_ART_screened if ART_total==0 & TB_ART_screened!=0 
 replace viral_load_test= viral_load_undetect if viral_load_test==0 & viral_load_undetect!=0
 
@@ -122,4 +123,14 @@ preserve
 	collapse (sum) Post_Contra-OPD_total  , by(region facility_type)
 	export excel using "$project/EFY 2014 results.xlsx", sheet("Sums") firstrow(variable) sheetreplace
 restore
+
+
+
+
+
+
+
+
+
+
 
