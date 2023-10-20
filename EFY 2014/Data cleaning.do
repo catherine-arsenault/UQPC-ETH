@@ -88,11 +88,13 @@ replace Hyper6_enrol_care = Hyper6_controlled if Hyper6_enrol_care==. & Hyper6_c
 
 replace Drug_presc_received = Drug_presc_100 if Drug_presc_received==. & Drug_presc_100!=.
 
+drop VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first Essential_drug_avail // removing these from the analysis
+
 save "$project/Data/Data for analysis/UQPC 2014.dta", replace
 *------------------------------------------------------------------------------*
 * CHECK COMPLETENESS AFTER IMPUTING ZEROS
 preserve 
-	local varlist Post_Contra  Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits syphilis_tested_preg Hepat_BC_tested_preg HIV_tested_preg IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first malnutrition_exit malnutrition_cured ART_still ART_original viral_load_undetect viral_load_tested TB_ART_screened ART_total Hyper_raised_BP Diabet_raised_BS Hyper_enrol_care Diabet_enrol_care Diabet6_controlled Diabet6_enrol_care Hyper6_controlled Hyper6_enrol_care Drug_presc_100 Drug_presc_received Essential_drug_avail FP_total OPD_total
+	local varlist Post_Contra  Faci_delivery ANC_first_16 ANC_first_total ANC_four_visits syphilis_tested_preg Hepat_BC_tested_preg HIV_tested_preg IFA_received_preg PNC_seven_days PNC_two_days DPT3_received DPT1_received OPV3_received OPV1_received PCV3_received PCV1_received Rota2_received Rota1_received malnutrition_exit malnutrition_cured ART_still ART_original viral_load_undetect viral_load_tested TB_ART_screened ART_total Hyper_raised_BP Diabet_raised_BS Hyper_enrol_care Diabet_enrol_care Diabet6_controlled Diabet6_enrol_care Hyper6_controlled Hyper6_enrol_care Drug_presc_100 Drug_presc_received  FP_total OPD_total
 
 	foreach x of local varlist  {
 		egen count`x'=count(`x'), by(organisationunitid)
@@ -118,11 +120,18 @@ replace ART_original = ART_still if ART_original==0 & ART_still!=0 // what about
 replace ART_total= TB_ART_screened if ART_total==0 & TB_ART_screened!=0 
 replace viral_load_test= viral_load_undetect if viral_load_test==0 & viral_load_undetect!=0
 
-* SUM OF SERVICES BY REGION AND FACILITY TYPE
-preserve 
-	collapse (sum) Post_Contra-OPD_total  , by(region facility_type)
-	export excel using "$project/EFY 2014 results.xlsx", sheet("Sums") firstrow(variable) sheetreplace
-restore
+* Drop facilities that report none of the indicators included
+egen total = rowtotal(Post_Contra-OPD_total) // 15097 facilities listed
+drop if total==0 // 3670 reported none of the indicators, remaining total is 11,427 facilities
+drop total
+
+egen total = rowtotal(Post_Contra-Drug_presc_received )
+gen onlyOPD=1 if OPD_total>0 & total==0 & FP_total==0 // 93 report only OPD
+gen onlyFP=1 if FP_total>0 & total==0  // 590 report only FP and OPD
+
+save "$project/Data/Data for analysis/UQPC 2014 annual by facility.dta", replace
+
+
 
 
 
