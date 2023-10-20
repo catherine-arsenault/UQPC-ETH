@@ -128,7 +128,7 @@ drop total
 egen total = rowtotal(Post_Contra-Drug_presc_received )
 gen onlyOPD=1 if OPD_total>0 & total==0 & FP_total==0 // 93 report only OPD
 gen onlyFP=1 if FP_total>0 & total==0  // 590 report only FP and OPD
-
+drop total only* 
 save "$project/Data/Data for analysis/UQPC 2014 annual by facility.dta", replace
 
 

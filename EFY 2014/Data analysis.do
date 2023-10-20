@@ -9,6 +9,7 @@ use "$project/Data/Data for analysis/UQPC 2014 annual by facility.dta", clear //
 
 	gen HP_IFA_received_preg = IFA_received_preg if ANC_first_total>0 & facility_type==1
 	replace IFA_received_preg = . if facility_type==1
+	
 * Collapsing at regional level by facility type
 	collapse (sum) Post_Contra-HP_IFA_received_preg  , by(region facility_type)
 
@@ -51,7 +52,10 @@ order region facility_type Faci_delivery Post_Contra ippcar ANC_first_total ANC_
 	 export excel using "$project/EFY 2014 results.xlsx", firstrow(variable) sheetreplace
 	  
 
-
+* ART cohort at end of year 
+	use "$project/Data/Data for analysis/UQPC 2014.dta", clear
+	keep if period==12
+	collapse (sum) ART_total  , by(region facility_type)
 
 
 
