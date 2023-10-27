@@ -73,7 +73,7 @@ replace ANC_first_16 = 0 if ANC_first_total!=. & ANC_first_total!=0 & ANC_first_
 
 replace syphilis_tested_preg= 0 if ANC_first_total!=. & ANC_first_total!=0 & syphilis_tested_preg==. & facility_type!=1
 replace Hepat_BC_tested_preg= 0 if ANC_first_total!=. & ANC_first_total!=0 & Hepat_BC_tested_preg==. & facility_type!=1
-replace HIV_tested_preg = 0 if ANC_first_total!=. & ANC_first_total!=0 & HIV_tested_preg==. & facility_type!=1
+replace HIV_tested_preg = 0 if ANC_first_total!=.     & ANC_first_total!=0 & HIV_tested_preg==. & facility_type!=1
 
 replace IFA_received_preg= 0 if  ANC_first_total!=. & ANC_first_total!=0  & IFA_received_preg==.
 
@@ -81,6 +81,7 @@ replace PNC_seven_days = PNC_two_days if PNC_seven_days==. & PNC_two_days!=.
 replace malnutrition_exit= malnutrition_cured if malnutrition_exit==. & malnutrition_cured!=.
 
 replace Hyper_raised_BP = Hyper_enrol_care if Hyper_raised_BP==. & Hyper_enrol_care!=.
+
 replace Diabet_raised_BS = Diabet_enrol_care if Diabet_raised_BS==. & Diabet_enrol_care !=.
 
 replace Diabet6_enrol_care = Diabet6_controlled if Diabet6_enrol_care==. & Diabet6_controlled!=.
