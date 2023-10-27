@@ -51,16 +51,20 @@ gen drug_avail = Drug_presc_100 / Drug_presc_received
 
 order region facility_type Faci_delivery Post_Contra ippcar ANC_first_total ANC_first_12  timely_anc ///
 	  ANC_four_visits anc4_retention ANC_eight_visits anc8_retention syphilis_tested_preg anc_syph ///
-	  Hepat_B_tested_preg anc_hep HIV_tested_preg anc_hiv malnu_screened_PLW anc_malnu IFA_received_preg ///
+	  Hepat_B_tested_preg anc_hep HIV_tested_preg anc_hiv malnu_screened_PLW anc_malnu HP_IFA_received_preg IFA_received_preg ///
 	  anc_IFA PNC_seven_days PNC_two_days timely_pnc pnc_rate Penta1_received Penta3_received penta_retention ///
 	  Polio1_received Polio3_received polio_retention pneumococcal1_received pneumococcal3_received ///
 	  pneumococcal_retention  Rota1_received Rota2_received rota_retention malnutrition_exit malnutrition_cured ///
 	  malnut_tx_success ART_original ART_still ART_12retention Viral_load_tested Viral_load_undetect ///
 	  viral_supress ART_total  TB_ART_screened TB_ART TB_case_total TB_case_completed TB_success  TPT_treat_started ///
-	  TPT_treat_completed TPT_compl  Hyper_raisedHP Hyper_Referred_HC   hyper_referal Diabet_raised_BS  ///
-	  Diabetes_Referred_HC diab_referal Hyper_raised_BP  Hyper_enrol_care hyper_tx Diabet_raised_BS  ///
-	  Diabet_enrol_care diab_tx  Hyper6_enrol_care Hyper6_controlled hyper_6control Diabet6_enrol_care ///
-	  Diabet6_controlled diab_6control cervical_test_positive  cervical_treated  cervical_tx ///
+	  TPT_treat_completed TPT_compl  ///
+	  Hyper_raisedHP Hyper_Referred_HC  hyper_referal ///
+	  Diabetes_raisedHP  Diabetes_Referred_HC diab_referal ///
+	  Hyper_raised_BP  Hyper_enrol_care hyper_tx ///
+	  Diabet_raised_BS  Diabet_enrol_care diab_tx  ///
+	  Hyper6_enrol_care Hyper6_controlled hyper_6control ///
+	  Diabet6_enrol_care Diabet6_controlled diab_6control ///
+	  cervical_test_positive  cervical_treated  cervical_tx ///
 	  Antibio_enco_total Antibio_enco_1plus antibio_prescrip Drug_presc_received ///
 	  Drug_presc_100 drug_avail
 
