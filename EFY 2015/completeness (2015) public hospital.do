@@ -1,11 +1,16 @@
 
 * Completeness assessment public hospitals EFY 2015 (2022-23)
 
+*global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
+global project "/Users/catherine.arsenault/Dropbox/9 PAPERS & PROJECTS/UQPC/DHIS2/"
 *------------------------------------------------------------------------------*
-
-global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
-import delimited "$project/DHIS2 data for utilization and quality of primary care/UQPC data for public hospitals for 2015.csv", clear
-
+* Merge with FP/OPD volume
+	import delimited "$project/Data/Raw/UQPC data for public hospitals for 2015.csv", clear
+	save  "$project/Data/Data for analysis/Public hospitals 2015.dta", replace
+	import delimited "$project/Data/Raw/UQPC volume data for Public Hospitals.csv for 2015 EFY.csv", clear
+	merge 1:1 organisationunitid  periodname using "$project/Data/Data for analysis/Public hospitals 2015.dta"
+	drop _merge
+	
 sort orgunitlevel2  organisationunitid  periodname
 encode orgunitlevel2, gen(region)
 encode organisationunitname, gen(facility_name)
@@ -111,30 +116,32 @@ rename ms_totalnumberofencounters Antibio_enco_total
 
 *------------------------------------------------------------------------------*/
 * RENAMING 2015 VARIABLES: FP & OPD
-		
+rename(totalnumberofnewandrepeataccepto ms_numberofoutpatientvisits) (FP_total OPD_total)
 *------------------------------------------------------------------------------*/	
 
-		
-**Option 2: Using the number of facilites that ever reproted as denominator 
-keep region facility_name org* period Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive Essential_drug_avail	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received 
-
-save  "$project/Data for analysis/Public hospital 2015.dta", replace
+keep region facility_name org* period Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive Essential_drug_avail	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received FP_total OPD_total
 *------------------------------------------------------------------------------*/
-
+* Removing Zeros (only 2 indicators have values of 0: TB_ART_screened TB_case_completed)
+local varlist Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive Essential_drug_avail	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received FP_total OPD_total
+foreach x of local varlist {
+	replace `x'=. if `x'==0
+}
+save  "$project/Data/Data for analysis/Public hospitals 2015.dta", replace
+*save  "$project/2014 & 2015 completenetss/data for analysis (2015)/Public hospitals 2015.dta", replace
+*------------------------------------------------------------------------------*/
 *completness table: Using the number of facilites that reproted at least onetime as denominator 
-
-local varlist Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive Essential_drug_avail	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received
 
 	foreach x of local varlist   {
 		egen count`x'=count(`x'), by(organisationunitid) 
 		replace count`x'=. if count`x'==0
 	}	
 		
-collapse (count) Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive Essential_drug_avail	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received	 count*, by(region period)	
+collapse (count) Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive Essential_drug_avail	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received	FP_total OPD_total count*, by(region period)	
 	
-	foreach x of local varlist  {
-		cap gen complete`x'= (`x'/count`x')*100
-	}	
+foreach x of local varlist  {
+cap gen complete`x'=(`x'/count`x')*100
+egen avg_compl_`x' = mean(complete`x'), by(region)
+}	
 
 export excel using "$project/completeness_Public hospital 2015.xlsx", sheet(Option_two) firstrow(variable) sheetreplace
 

@@ -1,19 +1,28 @@
 
 * Completeness assessment health posts  EFY 2015 (2022-23)
-
+*global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
+global project "/Users/catherine.arsenault/Dropbox/9 PAPERS & PROJECTS/UQPC/DHIS2/"
 *------------------------------------------------------------------------------*
 * Note: before importing the data from csv file to stata i have droped one variable (orgunitlevel6 ) from both  csv files so that i can get equal number of variables (87 variables) with the same name when i import it to stata.
+
 *Merging of health posts data: Oromia + Somali
 
-global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
-import delimited "$project/DHIS2 data for utilization and quality of primary care/UQPC data for Health post for oromia regions for 2015 EFY.csv", clear 
-save "$project/DHIS2 data for utilization and quality of primary care/UQPC data for Health post for oromia regions for 2015 EFY.csv-Oromia",replace
-
-
-import delimited "$project/DHIS2 data for utilization and quality of primary care/UQPC data for Health post for somali regions for 2015 EFY.csv", clear
-
-append using "$project/DHIS2 data for utilization and quality of primary care/UQPC data for Health post for oromia regions for 2015 EFY.csv-Oromia", force
-
+* Oromia
+	import delimited "$project/Data/Raw/UQPC data for Health post for oromia regions for 2015 EFY.csv", clear 
+	save  "$project/Data/Data for analysis/Health posts 2015.dta", replace	
+	import delimited "$project/Data/Raw/UQPC Volume data for Health post for oromia regions.csv for 2015 EFY.csv", clear 
+	merge 1:1 organisationunitid periodid using  "$project/Data/Data for analysis/Health posts 2015.dta"
+	drop _merge
+	save  "$project/Data/Data for analysis/Health posts 2015.dta", replace	
+* Somali 
+	import delimited "$project/Data/Raw/UQPC data for Health post for somali regions for 2015 EFY.csv", clear
+	save "$project/Data/Data for analysis/tmp.dta", replace	
+	import delimited "$project/Data/Raw/UQPC Volume data for Health post for Somali regions.csv for 2015 EFY.csv", clear 
+	merge 1:1 organisationunitid periodid using "$project/Data/Data for analysis/tmp.dta"
+	drop _merge
+	append using "$project/Data/Data for analysis/Health posts 2015.dta", force
+	rm "$project/Data/Data for analysis/tmp.dta" 
+	
 sort orgunitlevel2  organisationunitid  periodname
 encode orgunitlevel2, gen(region)
 encode organisationunitname, gen(facility_name)
@@ -28,8 +37,8 @@ move period orgunitlevel1
 
 *------------------------------------------------------------------------------*
 * RENAMING 2015 VARIABLES: MCH + HIV
-rename mat_immediatepostpartumcontracep Post_Contra
-rename totalnumberofbirthsattendedbyski Faci_delivery
+*rename mat_immediatepostpartumcontracep Post_Contra
+* rename totalnumberofbirthsattendedbyski Faci_delivery // dropping from analysis (there should not be deliveries in HPs)
 
 rename mat_totalnumberofpregnantwomenth ANC_first_12
 rename v17  ANC_first_total
@@ -61,40 +70,48 @@ rename nut_numberofchildrencured malnutrition_cured
 rename nut_numberofchildrenwhoexitfroms malnutrition_exit
 
 *------------------------------------------------------------------------------
-* RENAMING 2015 VARIABLES: HYPERTENSION, DIABETES, CERVICAL CANCER
+* RENAMING 2015 VARIABLES: HYPERTENSION, DIABETES,
 
 rename ncd_hypertensivepatientsreferred Hyper_Referred_HC
+rename ncd_numberofindividualsscreenedf Hyper_raisedHP
+
 rename ncd_individualsscreenedfordiabet Diabetes_Referred_HC
+rename v67 Diabetes_raisedHP
 
 *------------------------------------------------------------------------------*
 * RENAMING 2015 VARIABLES: STRUCTURAL QUALITY
 
-rename pms_essentialdrugsavailability Essential_drug_avail // already an indicator in %
+*rename pms_essentialdrugsavailability Essential_drug_avail // already an indicator in %
 
 *------------------------------------------------------------------------------*/
 * RENAMING 2015 VARIABLES: FP & OPD
-		
+rename (totalnumberofnewandrepeataccepto ms_numberofoutpatientvisits) (FP_total OPD_total)
+	
 *------------------------------------------------------------------------------*/	
+keep region facility_name org* period  ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP	FP_total OPD_total
+*------------------------------------------------------------------------------*/
+* Removing Zeros (only 3 indicators have values of 0: PNC two days, Essential drug availability and FP_total)
+  local varlist  ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
+  
+  foreach x of local varlist {
+	replace `x'=. if `x'==0
+}	
 
-keep region facility_name org* period Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Essential_drug_avail	
-
-save  "$project/Data for analysis/health posts 2015.dta", replace
+save  "$project/Data/Data for analysis/Health posts 2015.dta", replace	
 *------------------------------------------------------------------------------*/
 
-*completness table: Using the number of facilites that reproted at least onetime as denominator 
-
-local varlist Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Essential_drug_avail
-
-	foreach x of local varlist   {
-		egen count`x'=count(`x'), by(organisationunitid) 
-		replace count`x'=. if count`x'==0
+* Completness table: Using the number of facilites that reproted at least onetime during the year as denominator 			
+foreach x of local varlist  {
+	egen count`x'=count(`x'), by(organisationunitid)
+	replace count`x'=. if count`x'==0
 	}	
 		
-collapse (count) Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Essential_drug_avail	 count*, by(region period)	
+collapse (count)  ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total count*, by(region period)	
 	
-	foreach x of local varlist  {
-		cap gen complete`x'= (`x'/count`x')*100
-	}	
+foreach x of local varlist  {
+	cap gen complete`x'=(`x'/count`x')*100
+	egen avg_compl_`x' = mean(complete`x'), by(region)
+}
 
 export excel using "$project/completeness_health posts 2015.xlsx", sheet(Option_two) firstrow(variable) sheetreplace
 

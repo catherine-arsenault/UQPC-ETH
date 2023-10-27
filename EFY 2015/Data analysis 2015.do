@@ -1,18 +1,18 @@
 
 * UQPC 
 * Data analysis
-
 *------------------------------------------------------------------------------*
 * EFY 2015
-global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
+*global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
+global project "/Users/catherine.arsenault/Dropbox/9 PAPERS & PROJECTS/UQPC/DHIS2/"
 
-use "$project/2014 & 2015 completenetss/data for analysis (2015)/UQPC 2015 annual by facility.dta", clear // sum of services in 10,694 facilities
+use "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", clear  // sum of services in 12066 facilities
 
 	gen HP_IFA_received_preg = IFA_received_preg if ANC_first_total>0 & facility_type==1
 	replace IFA_received_preg = . if facility_type==1
 	
 * Collapsing at regional level by facility type
-	collapse (sum) Post_Contra-HP_IFA_received_preg  , by(region facility_type)
+	collapse (sum) FP_total-HP_IFA_received_preg  , by(region facility_type)
 
 * Creating the quality indicators
 gen ippcar = Post_Contra/Faci_delivery
@@ -37,8 +37,8 @@ gen viral_supress = Viral_load_undetect / Viral_load_tested
 gen TB_ART = TB_ART_screened / ART_total
 gen TB_success = TB_case_completed / TB_case_total
 gen TPT_compl = TPT_treat_completed / TPT_treat_started
-gen hyper_referal = Hyper_Referred_HC / Hyper_raised_BP
-gen diab_referal =  Diabetes_Referred_HC / Diabet_raised_BS 
+gen hyper_referal = Hyper_Referred_HC / Hyper_raisedHP
+gen diab_referal =  Diabetes_Referred_HC / Diabetes_raisedHP
 gen hyper_tx = Hyper_enrol_care / Hyper_raised_BP  
 gen diab_tx = Diabet_enrol_care / Diabet_raised_BS 
 gen hyper_6control= Hyper6_controlled / Hyper6_enrol_care
@@ -57,17 +57,18 @@ order region facility_type Faci_delivery Post_Contra ippcar ANC_first_total ANC_
 	  pneumococcal_retention  Rota1_received Rota2_received rota_retention malnutrition_exit malnutrition_cured ///
 	  malnut_tx_success ART_original ART_still ART_12retention Viral_load_tested Viral_load_undetect ///
 	  viral_supress ART_total  TB_ART_screened TB_ART TB_case_total TB_case_completed TB_success  TPT_treat_started ///
-	  TPT_treat_completed TPT_compl Hyper_raised_BP Hyper_Referred_HC hyper_referal Diabet_raised_BS ///
-	  Diabetes_Referred_HC diab_referal Hyper_enrol_care hyper_tx Diabet_enrol_care diab_tx  Hyper6_enrol_care ///
-	  Hyper6_controlled hyper_6control Diabet6_enrol_care Diabet6_controlled diab_6control cervical_test_positive ///
-	  cervical_treated  cervical_tx Antibio_enco_total Antibio_enco_1plus antibio_prescrip Drug_presc_received ///
+	  TPT_treat_completed TPT_compl  Hyper_raisedHP Hyper_Referred_HC   hyper_referal Diabet_raised_BS  ///
+	  Diabetes_Referred_HC diab_referal Hyper_raised_BP  Hyper_enrol_care hyper_tx Diabet_raised_BS  ///
+	  Diabet_enrol_care diab_tx  Hyper6_enrol_care Hyper6_controlled hyper_6control Diabet6_enrol_care ///
+	  Diabet6_controlled diab_6control cervical_test_positive  cervical_treated  cervical_tx ///
+	  Antibio_enco_total Antibio_enco_1plus antibio_prescrip Drug_presc_received ///
 	  Drug_presc_100 drug_avail
 
 	 export excel using "$project/EFY 2015 results.xlsx", firstrow(variable) sheetreplace
 	  
 
 * ART cohort at end of year 
-	use "$project/2014 & 2015 completenetss/data for analysis (2015)/UQPC 2015.dta", clear
+	use "$project/Data/Data for analysis/UQPC 2015.dta", clear
 	keep if period==12
 	collapse (sum) ART_total  , by(region facility_type)
 
