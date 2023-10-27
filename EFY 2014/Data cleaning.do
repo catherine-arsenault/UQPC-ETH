@@ -122,7 +122,7 @@ replace viral_load_test= viral_load_undetect if viral_load_test==0 & viral_load_
 
 * Drop facilities that report none of the indicators included
 egen total = rowtotal(Post_Contra-OPD_total) // 15097 facilities listed
-drop if total==0 // 3670 reported none of the indicators, remaining total is 11,427 facilities
+drop if total==0 // 3718 reported none of the indicators, remaining total is 11,379 facilities
 drop total
 
 egen total = rowtotal(Post_Contra-Drug_presc_received )
