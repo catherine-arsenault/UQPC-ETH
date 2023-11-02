@@ -54,8 +54,11 @@ order region facility_type Faci_delivery Post_Contra ippcar ANC_first_total ANC_
 
 * ART cohort at end of year 
 	use "$project/Data/Data for analysis/UQPC 2014.dta", clear
+	
+	keep region period facility_type ART_original ART_still TB_ART_screened ART_total viral_load_undetect viral_load_tested
 	keep if period==12
-	collapse (sum) ART_total  , by(region facility_type)
+	collapse (sum) TB_ART_screened ART_total  , by(region facility_type)
+	
 
 
 

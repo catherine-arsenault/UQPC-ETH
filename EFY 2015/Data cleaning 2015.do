@@ -62,8 +62,6 @@ save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 *------------------------------------------------------------------------------*
 * FACILITY-LEVEL DATA CLEANING: MONTHLY DATA
 
-* no outlier value
-
 * Replace missing indicators to 0 when related indicator is not missing
 replace Post_Contra = 0 if Faci_delivery!=. & Faci_delivery!=0 & Post_Contra==.
 
@@ -87,13 +85,13 @@ replace Hyper6_enrol_care = Hyper6_controlled if Hyper6_enrol_care==. & Hyper6_c
 
 replace Drug_presc_received = Drug_presc_100 if Drug_presc_received==. & Drug_presc_100!=.
 
-drop VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first Essential_drug_avail // removing these from the analysis
+drop VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first Essential_drug_avail // removing these data elements from the analysis
 
-save "$project/Data/Data for analysis/UQPC 2015.dta", replace
+save "$project/Data/Data for analysis/UQPC 2015.dta", replace 
 *------------------------------------------------------------------------------*
 * CHECK COMPLETENESS AFTER IMPUTING ZEROS
 preserve 
-	local varlist Post_Contra Faci_delivery ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive 	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
+	local varlist Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive 	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
 
 	foreach x of local varlist  {
 		egen count`x'=count(`x'), by(organisationunitid)
@@ -108,23 +106,92 @@ preserve
 		egen avg_compl_`x' = mean(complete`x'), by(region facility_type) 
 	}
 	
-	order avg_*, after(completeDiabetes_Referred_HC)
-	export excel using "$project/completeness_2015_after_cleaning.xlsx", firstrow(variable) sheetreplace
+	order avg_*, after(completeOPD_total)
+	export excel using "$project/completeness_2015_after_cleaning.xlsx", firstrow(variable) sheet("By fac type") sheetreplace
 restore 		
+
+preserve
+foreach x of local varlist  {
+		egen count`x'=count(`x'), by(organisationunitid)
+		replace count`x'=. if count`x'==0
+		}	
+		
+	collapse (count) FP_total-countOPD_total, by(region period )
+	sort region period
+	
+	foreach x of local varlist  {
+		gen complete`x'=(`x'/count`x')*100
+		egen avg_compl_`x' = mean(complete`x'), by(region) 
+	}
+	
+	order avg_*, after(completeDiabetes_Referred_HC)
+	export excel using "$project/completeness_2015_after_cleaning.xlsx", firstrow(variable) sheet("By region") sheetreplace
+restore 
+*------------------------------------------------------------------------------*
+* Analysis focused on a subset of data elements
+global finallist FP_total OPD_total Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits syphilis_tested_preg HIV_tested_preg IFA_received_preg Penta3_received Penta1_received Rota2_received Rota1_received ART_still ART_original Viral_load_undetect Viral_load_tested TB_case_total TB_case_completed Hyper6_controlled Hyper6_enrol_care Diabet6_controlled Diabet6_enrol_care Antibio_enco_1plus Antibio_enco_total 
+
+* Removing facilities that don't report 
+egen total = rowtotal($finallist)
+egen maxtotal= max(total), by(organisationunitid)
+drop if maxtotal ==0
+drop total maxtotal // 144,732 observations and 12,061 unique facilities
+
+/* Identifying outliers
+ Outliers defined as observations that are greater than 3 SD from the mean over the year
+ and are volumes larger than 100 clients.
+*/
+foreach x of global finallist {
+	egen mean`x'= mean(`x'), by(organisationunitid)
+	egen sd`x'= sd(`x'), by(organisationunitid)
+	gen pos_out`x' = mean`x'+(3*(sd`x')) 
+	gen flag_pout`x' = 1 if `x'> pos_out`x' & `x'<.
+	replace flag_pout`x' =. if mean`x' <100
+	egen flag`x' = max(flag_pout`x'), by(organisationunitid)
+}
+	tab1 flag_pout*
+/* FP_total 57 OPD_total 134  Faci_delivery 3 
+	ANC_first_total 6   ANC_four_visits 5 
+	syphilis_tested_preg 7 HIV_tested_preg 3 IFA_received_preg 9 Penta3_received 2
+	Penta1_received 2 Rota1_received 2 Viral_load_tested 2 Viral_load_undetect 2
+	Hyper6_enrol_care 1 Diabet6_enrol_care 1 Antibio_enco_1plus 11 Antibio_enco_total 19
+	FP_total		108,499	
+	OPD_total		100,220	
+	Faci_deliv~y	22,015	
+	ANC_first_~l	40,466	
+	ANC_four_v~s	37,193	
+						
+	syphilis_t~g	23,953	
+	HIV_tested~g	23,914	
+	IFA_receiv~g	78,021	
+	Penta3_rec~d	99,761	
+	Penta1_rec~d	100,157	
+						
+	Rota1_rece~d	99,210	
+	Viral_load~d	4,561	
+	Viral_load~t	4,203	
+	Hyper6_enr~e	9,427	
+	Diabet6_en~e	4,987	
+						
+	Antibio_en~s	13,314	
+	Antibio_en~l	13,518	
+*/
+	
+* Replace outliers to missing
+foreach x of global finallist {
+	replace `x'= . if flag_pout`x' == 1
+}
+
 *------------------------------------------------------------------------------*
 * FACILITY-LEVEL DATA CLEANING: ANNUAL LEVEL
-
+	keep region facility_type facid org* $finallist
+	
 * Collapse at the annual level for each facility 
-collapse (sum) FP_total-Diabetes_raisedHP, by(region facility_type facid org*)
+collapse (sum) FP_total-TB_case_completed, by(region facility_type facid org*)
 
 replace ART_original = ART_still if ART_original==0 & ART_still!=0 // what about the transfers ?
-replace ART_total= TB_ART_screened if ART_total==0 & TB_ART_screened!=0 
+*replace ART_total= TB_ART_screened if ART_total==0 & TB_ART_screened!=0 
 replace Viral_load_tested= Viral_load_undetect if Viral_load_tested==0 & Viral_load_undetect!=0
-
-* Drop facilities that report none of the indicators included
-egen total = rowtotal(FP_total-Diabetes_raisedHP) // 15,578 facilities listed
-drop if total==0 // 3512 reported none of the indicators, remaining total is 12066 facilities
-drop total
 
 save "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", replace
 

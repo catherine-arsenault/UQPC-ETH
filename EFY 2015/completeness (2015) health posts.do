@@ -37,7 +37,7 @@ move period orgunitlevel1
 
 *------------------------------------------------------------------------------*
 * RENAMING 2015 VARIABLES: MCH + HIV
-*rename mat_immediatepostpartumcontracep Post_Contra
+rename mat_immediatepostpartumcontracep Post_Contra
 * rename totalnumberofbirthsattendedbyski Faci_delivery // dropping from analysis (there should not be deliveries in HPs)
 
 rename mat_totalnumberofpregnantwomenth ANC_first_12
@@ -88,10 +88,10 @@ rename v67 Diabetes_raisedHP
 rename (totalnumberofnewandrepeataccepto ms_numberofoutpatientvisits) (FP_total OPD_total)
 	
 *------------------------------------------------------------------------------*/	
-keep region facility_name org* period  ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP	FP_total OPD_total
+keep region facility_name org* period  Post_Contra ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP	FP_total OPD_total
 *------------------------------------------------------------------------------*/
 * Removing Zeros (only 3 indicators have values of 0: PNC two days, Essential drug availability and FP_total)
-  local varlist  ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
+  local varlist Post_Contra ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
   
   foreach x of local varlist {
 	replace `x'=. if `x'==0
@@ -106,7 +106,7 @@ foreach x of local varlist  {
 	replace count`x'=. if count`x'==0
 	}	
 		
-collapse (count)  ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total count*, by(region period)	
+collapse (count) Post_Contra ANC_first_12	ANC_first_total ANC_four_visits	 ANC_eight_visits  	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received VitaminA2_received	VitaminA1_received Dewormed_second	Dewormed_first malnutrition_cured	malnutrition_exit  Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total count*, by(region period)	
 	
 foreach x of local varlist  {
 	cap gen complete`x'=(`x'/count`x')*100
