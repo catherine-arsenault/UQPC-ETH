@@ -60,35 +60,6 @@ sort region facility_type facid period
 save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 
 *------------------------------------------------------------------------------*
-/* FACILITY-LEVEL DATA CLEANING: MONTHLY DATA
-
-* Replace missing indicators to 0 when related indicator is not missing
-replace Post_Contra = 0 if Faci_delivery!=. & Faci_delivery!=0 & Post_Contra==.
-
-replace ANC_first_12 = 0 if ANC_first_total!=. & ANC_first_total!=0 & ANC_first_12 ==.
-
-replace syphilis_tested_preg= 0 if ANC_first_total!=. & ANC_first_total!=0 & syphilis_tested_preg==. & facility_type!=1
-replace Hepat_B_tested_preg= 0 if ANC_first_total!=.  & ANC_first_total!=0 & Hepat_B_tested_preg==. & facility_type!=1
-replace HIV_tested_preg = 0 if ANC_first_total!=.     & ANC_first_total!=0 & HIV_tested_preg==. & facility_type!=1
-
-replace IFA_received_preg= 0 if  ANC_first_total!=. & ANC_first_total!=0  & IFA_received_preg==.
-
-replace PNC_seven_days = PNC_two_days if PNC_seven_days==. & PNC_two_days!=.
-replace malnutrition_exit= malnutrition_cured if malnutrition_exit==. & malnutrition_cured!=.
-
-replace Hyper_raised_BP = Hyper_enrol_care if Hyper_raised_BP==. & Hyper_enrol_care!=.
-
-replace Diabet_raised_BS = Diabet_enrol_care if Diabet_raised_BS==. & Diabet_enrol_care !=.
-
-replace Diabet6_enrol_care = Diabet6_controlled if Diabet6_enrol_care==. & Diabet6_controlled!=.
-replace Hyper6_enrol_care = Hyper6_controlled if Hyper6_enrol_care==. & Hyper6_controlled!=.
-
-replace Drug_presc_received = Drug_presc_100 if Drug_presc_received==. & Drug_presc_100!=.
-
-drop VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first Essential_drug_avail // removing these data elements from the analysis*/
-
-save "$project/Data/Data for analysis/UQPC 2015.dta", replace 
-*------------------------------------------------------------------------------*
 * CHECK COMPLETENESS AFTER IMPUTING ZEROS
 preserve 
 	local varlist Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive 	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
