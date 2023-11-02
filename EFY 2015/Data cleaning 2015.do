@@ -60,7 +60,7 @@ sort region facility_type facid period
 save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 
 *------------------------------------------------------------------------------*
-* FACILITY-LEVEL DATA CLEANING: MONTHLY DATA
+/* FACILITY-LEVEL DATA CLEANING: MONTHLY DATA
 
 * Replace missing indicators to 0 when related indicator is not missing
 replace Post_Contra = 0 if Faci_delivery!=. & Faci_delivery!=0 & Post_Contra==.
@@ -85,7 +85,7 @@ replace Hyper6_enrol_care = Hyper6_controlled if Hyper6_enrol_care==. & Hyper6_c
 
 replace Drug_presc_received = Drug_presc_100 if Drug_presc_received==. & Drug_presc_100!=.
 
-drop VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first Essential_drug_avail // removing these data elements from the analysis
+drop VitaminA2_received VitaminA1_received Dewormed_second Dewormed_first Essential_drug_avail // removing these data elements from the analysis*/
 
 save "$project/Data/Data for analysis/UQPC 2015.dta", replace 
 *------------------------------------------------------------------------------*
@@ -184,14 +184,14 @@ foreach x of global finallist {
 
 *------------------------------------------------------------------------------*
 * FACILITY-LEVEL DATA CLEANING: ANNUAL LEVEL
-	keep region facility_type facid org* $finallist
+	keep region period facility_type facid org* $finallist
 	
 * Collapse at the annual level for each facility 
-collapse (sum) FP_total-TB_case_completed, by(region facility_type facid org*)
+	collapse (sum) FP_total-TB_case_completed, by(region facility_type facid org*)
 
-replace ART_original = ART_still if ART_original==0 & ART_still!=0 // what about the transfers ?
+*replace ART_original = ART_still if ART_original==0 & ART_still!=0 // what about the transfers in ?
 *replace ART_total= TB_ART_screened if ART_total==0 & TB_ART_screened!=0 
-replace Viral_load_tested= Viral_load_undetect if Viral_load_tested==0 & Viral_load_undetect!=0
+* replace Viral_load_tested= Viral_load_undetect if Viral_load_tested==0 & Viral_load_undetect!=0
 
 save "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", replace
 

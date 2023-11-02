@@ -29,7 +29,7 @@ use "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", clear  /
 	 export excel using "$project/EFY 2015 results.xlsx", firstrow(variable) sheetreplace
 	  
 
-* ART cohort at end of year 
+/* ART cohort at end of year 
 	use "$project/Data/Data for analysis/UQPC 2015.dta", clear
 	keep if period==12
 	collapse (sum) ART_total  , by(region facility_type)
