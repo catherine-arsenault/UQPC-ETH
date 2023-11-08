@@ -24,6 +24,7 @@ use "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", clear  /
 	c_Hyper6_controlled=Hyper6_controlled c_Hyper6_enrol_care=Hyper6_enrol_care ///
 	c_Diabet6_controlled=Diabet6_controlled c_Diabet6_enrol_care=Diabet6_enrol_care ///
 	c_Antibio_enco_1plus=Antibio_enco_1plus c_Antibio_enco_total=Antibio_enco_total ///
+	c_Drug_presc_100=Drug_presc_100 c_Drug_presc_received = Drug_presc_received ///
 	c_TB_case_completed=TB_case_completed, by(region facility_type)
 
 	 export excel using "$project/EFY 2015 results.xlsx", firstrow(variable) sheetreplace
