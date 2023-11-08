@@ -60,7 +60,7 @@ sort region facility_type facid period
 save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 
 *------------------------------------------------------------------------------*
-* CHECK COMPLETENESS AFTER IMPUTING ZEROS
+* CHECK COMPLETENESS 
 preserve 
 	local varlist Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive 	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
 
@@ -100,13 +100,13 @@ foreach x of local varlist  {
 restore 
 *------------------------------------------------------------------------------*
 * Analysis focused on a subset of data elements
-global finallist FP_total OPD_total Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits syphilis_tested_preg HIV_tested_preg IFA_received_preg Penta3_received Penta1_received Rota2_received Rota1_received ART_still ART_original Viral_load_undetect Viral_load_tested TB_case_total TB_case_completed Hyper6_controlled Hyper6_enrol_care Diabet6_controlled Diabet6_enrol_care Antibio_enco_1plus Antibio_enco_total 
+global finallist FP_total OPD_total Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits syphilis_tested_preg HIV_tested_preg IFA_received_preg Penta3_received Penta1_received Rota2_received Rota1_received ART_still ART_original Viral_load_undetect Viral_load_tested TB_case_total TB_case_completed Hyper6_controlled Hyper6_enrol_care Diabet6_controlled Diabet6_enrol_care Antibio_enco_1plus Antibio_enco_total Drug_presc_100	Drug_presc_received
 
 * Removing facilities that don't report 
 egen total = rowtotal($finallist)
 egen maxtotal= max(total), by(organisationunitid)
 drop if maxtotal ==0
-drop total maxtotal // 144,732 observations and 12,061 unique facilities
+drop total maxtotal // 144,744 observations and 12,062 unique facilities
 
 /* Identifying outliers
  Outliers defined as observations that are greater than 3 SD from the mean over the year
@@ -141,11 +141,13 @@ foreach x of global finallist {
 	Rota1_rece~d	99,210	
 	Viral_load~d	4,561	
 	Viral_load~t	4,203	
+**# Bookmark #1
 	Hyper6_enr~e	9,427	
 	Diabet6_en~e	4,987	
 						
 	Antibio_en~s	13,314	
 	Antibio_en~l	13,518	
+	
 */
 	
 * Replace outliers to missing
