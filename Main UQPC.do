@@ -23,3 +23,5 @@ do "$github/EFY 2015/completeness (2015) health center.do"
 do "$github/EFY 2015/completeness (2015) private clinics.do"
 do "$github/EFY 2015/completeness (2015) public hospital.do"
 do "$github/EFY 2015/completeness (2015) private hospital.do"
+
+do "$github/EFY 2015/Data cleaning.do"

@@ -1,47 +1,48 @@
 
-* UQPC 
+* Primary care performance
 * Data cleaning
 * EFY 2015
 *------------------------------------------------------------------------------*
 *global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
 global project "/Users/catherine.arsenault/Dropbox/9 PAPERS & PROJECTS/UQPC/DHIS2/"
+
 * Appending facility types 
-*HP
-use "$project/Data/Data for analysis/Health posts 2015.dta", clear
-drop region facility_name
-gen facility_type = 1
-save "$project/Data/Data for analysis/UQPC 2015.dta", replace
-*HC
-use "$project/Data/Data for analysis/Health centers 2015.dta", clear
-drop region facility_name
-gen facility_type = 2
-append using "$project/Data/Data for analysis/UQPC 2015.dta", force
-save "$project/Data/Data for analysis/UQPC 2015.dta", replace
+	*HP
+	use "$project/Data/Data for analysis/Health posts 2015.dta", clear
+	drop region facility_name
+	gen facility_type = 1
+	save "$project/Data/Data for analysis/UQPC 2015.dta", replace
+	*HC
+	use "$project/Data/Data for analysis/Health centers 2015.dta", clear
+	drop region facility_name
+	gen facility_type = 2
+	append using "$project/Data/Data for analysis/UQPC 2015.dta", force
+	save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 
-*Clinics
-use "$project/Data/Data for analysis/Private clinics 2015.dta", clear
-drop region facility_name
-gen facility_type = 3
-append using "$project/Data/Data for analysis/UQPC 2015.dta", force
-save "$project/Data/Data for analysis/UQPC 2015.dta", replace
+	*Clinics
+	use "$project/Data/Data for analysis/Private clinics 2015.dta", clear
+	drop region facility_name
+	gen facility_type = 3
+	append using "$project/Data/Data for analysis/UQPC 2015.dta", force
+	save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 
-* Public H
-use "$project/Data/Data for analysis/Public hospitals 2015.dta", clear
-drop region facility_name
-gen facility_type = 4
-append using "$project/Data/Data for analysis/UQPC 2015.dta" , force
-save "$project/Data/Data for analysis/UQPC 2015.dta", replace
+	* Public H
+	use "$project/Data/Data for analysis/Public hospitals 2015.dta", clear
+	drop region facility_name
+	gen facility_type = 4
+	append using "$project/Data/Data for analysis/UQPC 2015.dta" , force
+	save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 
-* Private H
-use "$project/Data/Data for analysis/Private hospitals 2015.dta", clear
-drop region facility_name
-gen facility_type = 5
-append using "$project/Data/Data for analysis/UQPC 2015.dta", force
-save "$project/Data/Data for analysis/UQPC 2015.dta", replace
+	* Private H
+	use "$project/Data/Data for analysis/Private hospitals 2015.dta", clear
+	drop region facility_name
+	gen facility_type = 5
+	append using "$project/Data/Data for analysis/UQPC 2015.dta", force
+	save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 
-order facility_type, after(orgunitlevel2)
-lab def facility_type 1"Health posts" 2"Health centers" 3"Private clinics" 4"Public hospitals" 5"Private hospitals"
-lab val facility_type facility_type
+	order facility_type, after(orgunitlevel2)
+	lab def facility_type 1"Health posts" 2"Health centers" 3"Private clinics" 4"Public hospitals" 5"Private hospitals"
+	lab val facility_type facility_type
 *------------------------------------------------------------------------------*
 encode orgunitlevel2, gen(region)
 drop orgunitlevel1
@@ -120,35 +121,9 @@ foreach x of global finallist {
 	replace flag_pout`x' =. if mean`x' <100
 	egen flag`x' = max(flag_pout`x'), by(organisationunitid)
 }
-	tab1 flag_pout*
-/* FP_total 57 OPD_total 134  Faci_delivery 3 
-	ANC_first_total 6   ANC_four_visits 5 
-	syphilis_tested_preg 7 HIV_tested_preg 3 IFA_received_preg 9 Penta3_received 2
-	Penta1_received 2 Rota1_received 2 Viral_load_tested 2 Viral_load_undetect 2
-	Hyper6_enrol_care 1 Diabet6_enrol_care 1 Antibio_enco_1plus 11 Antibio_enco_total 19
-	FP_total		108,499	
-	OPD_total		100,220	
-	Faci_deliv~y	22,015	
-	ANC_first_~l	40,466	
-	ANC_four_v~s	37,193	
-						
-	syphilis_t~g	23,953	
-	HIV_tested~g	23,914	
-	IFA_receiv~g	78,021	
-	Penta3_rec~d	99,761	
-	Penta1_rec~d	100,157	
-						
-	Rota1_rece~d	99,210	
-	Viral_load~d	4,561	
-	Viral_load~t	4,203	
-**# Bookmark #1
-	Hyper6_enr~e	9,427	
-	Diabet6_en~e	4,987	
-						
-	Antibio_en~s	13,314	
-	Antibio_en~l	13,518	
+	tabstat flag_pout*, stat(count) col(stat)
+ 	tabstat $finallist , stat(count) col(stat)
 	
-*/
 	
 * Replace outliers to missing
 foreach x of global finallist {
