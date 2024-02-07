@@ -3,7 +3,8 @@
 *global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
 global project "/Users/catherine.arsenault/Dropbox/9 PAPERS & PROJECTS/UQPC/DHIS2/"
 *------------------------------------------------------------------------------*
-* Note: before importing the data from csv file to stata i have droped one variable (orgunitlevel6 ) from both  csv files so that i can get equal number of variables (87 variables) with the same name when i import it to stata.
+/* Note: before importing the data from csv file to stata i have droped one variable (orgunitlevel6 ) from both  csv files so that 
+I can get equal number of variables (87 variables) with the same name when i import it to stata. */
 
 *Merging of health posts data: Oromia + Somali
 

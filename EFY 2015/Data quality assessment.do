@@ -1,6 +1,6 @@
 
 * Primary care performance
-* Data cleaning
+* Data quality assessments
 * EFY 2015
 *------------------------------------------------------------------------------*
 *global project "/Users/dessalegnsheabo/Desktop/UQPC/DHIS2"
@@ -61,7 +61,7 @@ sort region facility_type facid period
 save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 
 *------------------------------------------------------------------------------*
-* CHECK COMPLETENESS 
+* COMPLETENESS ASSESSMENT
 preserve 
 	local varlist Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive 	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
 
@@ -109,8 +109,9 @@ egen maxtotal= max(total), by(organisationunitid)
 drop if maxtotal ==0
 drop total maxtotal // 144,744 observations and 12,062 unique facilities
 
-/* Identifying outliers
- Outliers defined as observations that are greater than 3 SD from the mean over the year
+*------------------------------------------------------------------------------*
+* IDENTIFYING OUTLIERS
+/* Outliers defined as observations that are greater than 3 SD from the mean over the year
  and are volumes larger than 100 clients.
 */
 foreach x of global finallist {
@@ -131,15 +132,8 @@ foreach x of global finallist {
 }
 
 *------------------------------------------------------------------------------*
-* FACILITY-LEVEL DATA CLEANING: ANNUAL LEVEL
-	keep region period facility_type facid org* $finallist
-	
 * Collapse at the annual level for each facility 
 	collapse (sum) FP_total-TB_case_completed, by(region facility_type facid org*)
-
-*replace ART_original = ART_still if ART_original==0 & ART_still!=0 // what about the transfers in ?
-*replace ART_total= TB_ART_screened if ART_total==0 & TB_ART_screened!=0 
-* replace Viral_load_tested= Viral_load_undetect if Viral_load_tested==0 & Viral_load_undetect!=0
 
 save "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", replace
 

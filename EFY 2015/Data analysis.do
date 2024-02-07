@@ -8,8 +8,6 @@ global project "/Users/catherine.arsenault/Dropbox/9 PAPERS & PROJECTS/UQPC/DHIS
 
 use "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", clear  // annual results in 12,061 facilities
 
-	*gen HP_IFA_received_preg = IFA_received_preg if ANC_first_total>0 & facility_type==1
-	*replace IFA_received_preg = . if facility_type==1
 	
 * Collapsing at regional level by facility type
 	collapse (sum) FP_total-TB_case_completed (count) c_FP_total=FP_total  ///
@@ -29,11 +27,6 @@ use "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", clear  /
 
 	 export excel using "$project/EFY 2015 results.xlsx", firstrow(variable) sheetreplace
 	  
-
-/* ART cohort at end of year 
-	use "$project/Data/Data for analysis/UQPC 2015.dta", clear
-	keep if period==12
-	collapse (sum) ART_total  , by(region facility_type)
 
 
 	
