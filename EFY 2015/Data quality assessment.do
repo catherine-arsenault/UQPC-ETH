@@ -103,15 +103,15 @@ restore
 * Analysis focused on a subset of data elements
 global finallist FP_total OPD_total Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits syphilis_tested_preg HIV_tested_preg IFA_received_preg Penta3_received Penta1_received Rota2_received Rota1_received ART_still ART_original Viral_load_undetect Viral_load_tested TB_case_total TB_case_completed Hyper6_controlled Hyper6_enrol_care Diabet6_controlled Diabet6_enrol_care Antibio_enco_1plus Antibio_enco_total Drug_presc_100	Drug_presc_received
 
-* Removing facilities that don't report 
+* Removing facilities that don't report any of the data elements of interest
 egen total = rowtotal($finallist)
 egen maxtotal= max(total), by(organisationunitid)
 drop if maxtotal ==0
-drop total maxtotal // 144,744 observations and 12,062 unique facilities
+drop total maxtotal // the final dataset includes 144,744 facility-month observations and 12,062 unique facilities
 
 *------------------------------------------------------------------------------*
-* IDENTIFYING OUTLIERS
-/* Outliers defined as observations that are greater than 3 SD from the mean over the year
+* IDENTIFYING AND REMOVING OUTLIERS
+/* Outliers are defined as observations that are greater than 3 SD from the mean over the year
  and are volumes larger than 100 clients.
 */
 foreach x of global finallist {
