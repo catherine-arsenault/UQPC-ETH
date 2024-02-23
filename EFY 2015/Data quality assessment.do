@@ -63,14 +63,15 @@ save "$project/Data/Data for analysis/UQPC 2015.dta", replace
 *------------------------------------------------------------------------------*
 * COMPLETENESS ASSESSMENT
 preserve 
-	local varlist Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits	 ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive 	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
+	local varlist Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits ANC_eight_visits  syphilis_tested_preg Hepat_B_tested_preg HIV_tested_preg malnu_screened_PLW	 IFA_received_preg PNC_two_days	PNC_seven_days  Penta3_received	Penta1_received Polio3_received	Polio1_received pneumococcal3_received	pneumococcal1_received Rota2_received	Rota1_received malnutrition_cured	malnutrition_exit ART_still ART_original Viral_load_undetect	Viral_load_tested TB_ART_screened	ART_total TB_case_completed	TB_case_total TPT_treat_completed	TPT_treat_started Hyper_enrol_care	Hyper_raised_BP Hyper6_controlled	Hyper6_enrol_care Diabet_enrol_care	Diabet_raised_BS  Diabet6_controlled	Diabet6_enrol_care cervical_treated	cervical_test_positive 	 Antibio_enco_1plus	Antibio_enco_total Drug_presc_100	Drug_presc_received Hyper_Referred_HC Diabetes_Referred_HC Hyper_raisedHP Diabetes_raisedHP FP_total OPD_total
 
 	foreach x of local varlist  {
-		egen count`x'=count(`x'), by(organisationunitid)
-		replace count`x'=. if count`x'==0
+		*Counts how many times each facility reports each indicator over the year
+		egen count`x'=count(`x'), by(organisationunitid) 
+		replace count`x'=. if count`x'==0 // those never reporting are set to missing
 		}	
-		
-	collapse (count) FP_total-countOPD_total, by(region period facility_type)
+	* Counts the number of facilities that report each month
+	collapse (count) FP_total-countOPD_total, by(region period facility_type) 
 	sort region facility_type period
 	
 	foreach x of local varlist  {
@@ -101,11 +102,19 @@ foreach x of local varlist  {
 restore 
 *------------------------------------------------------------------------------*
 * Analysis focused on a subset of data elements
-global finallist FP_total OPD_total Post_Contra Faci_delivery ANC_first_12 ANC_first_total ANC_four_visits syphilis_tested_preg HIV_tested_preg IFA_received_preg Penta3_received Penta1_received Rota2_received Rota1_received ART_still ART_original Viral_load_undetect Viral_load_tested TB_case_total TB_case_completed Hyper6_controlled Hyper6_enrol_care Diabet6_controlled Diabet6_enrol_care Antibio_enco_1plus Antibio_enco_total Drug_presc_100	Drug_presc_received
+global finallist FP_total OPD_total Post_Contra Faci_delivery ANC_first_12 ANC_first_total ///
+ANC_four_visits syphilis_tested_preg HIV_tested_preg IFA_received_preg Penta3_received ///
+Penta1_received Rota2_received Rota1_received ART_still ART_original Viral_load_undetect ///
+Viral_load_tested TB_case_total TB_case_completed Hyper6_controlled Hyper6_enrol_care ///
+Diabet6_controlled Diabet6_enrol_care Antibio_enco_1plus Antibio_enco_total Drug_presc_100	Drug_presc_received
 
 * Removing facilities that don't report any of the data elements of interest
 egen total = rowtotal($finallist)
 egen maxtotal= max(total), by(organisationunitid)
+preserve
+	keep if maxtotal==0
+	save  "$project/facilities not reporting.dta", replace
+restore
 drop if maxtotal ==0
 drop total maxtotal // the final dataset includes 144,744 facility-month observations and 12,062 unique facilities
 
@@ -137,7 +146,13 @@ foreach x of global finallist {
 
 save "$project/Data/Data for analysis/UQPC 2015 annual by facility.dta", replace
 
+*------------------------------------------------------------------------------*
+* Describing facilities not reporting primary care services
+	u "$project/facilities not reporting.dta", clear
+	egen tag=tag(facid)
+	ta facility_type if tag
 
+ 
 
 
 
